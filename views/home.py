@@ -2,6 +2,7 @@ from dash import html, dcc
 from dash.dependencies import Input, Output, State
 import plotly
 import dash
+import numpy as np
 
 from server import app, server
 from views import home
@@ -73,17 +74,20 @@ def updateFigure(n):
 
     df = dataReader()
 
+    # Trace 0
     PM25 = dict(
         name='PM 2.5',
-        type="scatter",
+        type="data",
         y=df[2],
         line={"color": "#FC0000"},
         mode="lines",
         fillcolor='rgba(69, 214, 255, 0.5)',
     )
+
+    # Trace 1
     PM10 = dict(
         name='PM 10',
-        type="scatter",
+        type="data",
         y=df[3],
         line={"color": "#45D6FF"},
         mode="lines",
@@ -91,12 +95,10 @@ def updateFigure(n):
     )
 
     layout = dict(
+        height=500,
         plot_bgcolor=app_color["graph_bg"],
         paper_bgcolor=app_color["graph_bg"],
         font={"color": "#fff"},
-        height=500,
-        autosize=True,
-        showlegend=True,
         xaxis={
             "range": [0, 200],
             "showline": True,
@@ -104,14 +106,17 @@ def updateFigure(n):
             "fixedrange": True,
             "tickvals": [0, 50, 100, 150, 200],
             "ticktext": ["200", "150", "100", "50", "0"],
-            "title": "Tiempo transcurrido [s]",
+            "title": "Tiempo transcurrido (seg)",
         },
         yaxis={
-            "range": [0, 90],
+            "range": [
+                0, 100,
+                0, 100,
+            ],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
-            "zeroline": True,
+            "zeroline": False,
             "gridcolor": app_color["graph_line"],
         },
     )

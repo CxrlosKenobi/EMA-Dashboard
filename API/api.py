@@ -62,12 +62,13 @@ def dataReader():
     sheetData = sh.sheet1.get_all_values()
 
     # Return the last 20 rows
-    return sheetData[-20:]
+    return sheetData[-1]
+
 
 
 
 def main():
-    for i in range(120):
+    for i in range(10):
         connection(credentials)
         t.sleep(.5)
 

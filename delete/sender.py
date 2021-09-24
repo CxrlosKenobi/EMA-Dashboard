@@ -43,6 +43,6 @@ def main():
 
     for i in range(1000):
         print(f'{i} || {connection(credentials)}')
-        t.sleep(6)
+        t.sleep(10)
 
 main()

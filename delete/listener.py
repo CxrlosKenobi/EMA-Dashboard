@@ -28,7 +28,7 @@ while True:
     with open('../listener.json') as f:
         credentials = json.load(f)
         dataReader(credentials)
-        t.sleep(6)
+        t.sleep(10)
 
 
 
