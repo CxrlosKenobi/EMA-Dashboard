@@ -5,43 +5,45 @@ import dash
 
 from server import app, server
 from views import home
-from db.api import get_current_time, get_hdc_te_data, get_hdc_hu_data
+from API.api import *
 import os
 
 app_color = {"graph_bg": "#082255", "graph_line": "#007ACE"}
 GRAPH_INTERVAL = os.environ.get("GRAPH_INTERVAL", 1000)
 
-layout = html.Div([
-    html.Div([
-        html.Div([
+
+layout = html.Div([ # Main div
+    html.Div([ # Main Section div
+        html.Div([ # Header div 1
             html.H4 (
-                'ESTACIÓN DE MONITOREO AMBIENTAL - EMA',
-                className='app__header__title'
+                'EMA - Estación de Monitoreo Ambiental',
+                className='appHeaderTitle'
             ),
             html.P(
-                'Dashboard de visualización de datos obtenidos por EMA, la Estación de Monitoreo Ambiental de CON-CIENCIA',
-                className='app__header__title--grey',
+                'Comunidad Nacional de Ciencia e Innovación (CON-CIENCIA)',
+                className='appHeaderTitle gray',
             ),
         ], className='app__header__desc'),
         html.Div([
             html.A(href='https://con-ciencia.cl/'),
             html.Img(
-                src=app.get_asset_url('assets/CC_ICON.png'),
+                src=app.get_asset_url('https://con-ciencia.cl/web/image/website/4/logo/Comunidad%20CON-CIENCIA?unique=c91f8b4'),
                 className='app__menu__img',
             )
         ], className='app__header__logo'),
-    ], className='app__header'),
-    html.Div([
-        html.Div([
+    ], className='AppHeader'),
+
+    html.Div([ # Main Section div 2
+        html.Div([ # Graph container
             html.Div([
-                html.Div([
+                html.Div([ # Header div
                     html.H6(
                         'Material Particulado en el Aire [ppm]',
                         className='graph__title'
                     )
                 ]),
                 dcc.Graph(
-                    id='GY91-live',
+                    id='graph-live',
                     figure=dict(
                         layout=dict(
                             plot_bgcolor=app_color['graph_bg'],
@@ -50,82 +52,31 @@ layout = html.Div([
                     ),
                 ),
                 dcc.Interval(
-                    id='GY91-update',
+                    id='graph-update',
                     interval=int(GRAPH_INTERVAL),
                     n_intervals=0
                 ),
             ], className='two-thirds column wind__speed__container'),
         ])
     ]),
-    html.Div([
-        html.Div([
-            html.Div([
-                html.H6(
-                    'Temperature [C]',
-                    className='graph__title'
-                )]
-            ),
-            dcc.Graph(
-                id='BMP280-live',
-                figure=dict(
-                    layout=dict(
-                        plot_bgcolor=app_color['graph_bg'],
-                        paper_bgcolor=app_color['graph_bg'],
-                        height=250
-                    )
-                )
-            ),
-            dcc.Interval(
-                id='BMP280-update',
-                interval=int(GRAPH_INTERVAL),
-                n_intervals=0
-            )
-        ], className='graph__container first'),
-        html.Div([
-            html.Div([
-                html.H6(
-                    'Humidity [%]',
-                    className='graph__title'
-                )
-            ]),
-            dcc.Graph(
-                id='HDC-live',
-                figure=dict(
-                    layout=dict(
-                        plot_bgcolor=app_color['graph_bg'],
-                        paper_bgcolor=app_color['graph_bg'],
-                    )
-                )
-            ),
-            dcc.Interval(
-                id='HDC-update',
-                interval=int(GRAPH_INTERVAL),
-                n_intervals=0
-            ),
-        ], className='graph__container second')
-    ], className='one-third column histogram__direction')
-], className='app__container')
+], className='MainContainer')
 
 @app.callback(
-    Output('GY91-live', 'figure'), [Input('GY91-update', 'n_intervals')]
+    Output('graph-live', 'figure'), [Input('graph-update', 'n_intervals')]
 )
+def updateFigure(n):
+    # total_time = get_current_time()
+    # df0 = get_hdc_te_data(total_time - 200, total_time)
+    # df1 = get_hdc_hu_data(total_time - 200, total_time)
 
-@app.callback(
-    Output('HDC-live', 'figure'), [Input('HDC-update', 'n_intervals')]
-)
-def update_hdc(n):
-    total_time = get_current_time()
-    df0 = get_hdc_te_data(total_time - 200, total_time)
-    df1 = get_hdc_hu_data(total_time - 200, total_time)
-
-    trace0 = dict(
+    PM25 = dict(
         name='Temperatura (C°)',
         type="scatter",
         y=df0["hdc1080_te"],
         line={"color": "#00BB2D"},
         mode="lines",
     )
-    trace1 = dict(
+    PM10 = dict(
         name='Humedad (%)',
         type="scatter",
         y=df1["hdc1080_hu"],
@@ -162,4 +113,4 @@ def update_hdc(n):
         },
     )
 
-    return {'data': [trace0, trace1], 'layout': layout}
+    return {'data': [PM25, PM10], 'layout': layout}

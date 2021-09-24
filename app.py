@@ -1,14 +1,8 @@
-from dash import dcc
-from dash import html
-from dash.dependencies import Input, Output, State
-import plotly
-import dash
-
-from server import app, server
+from dash import dcc, html
+from server import app
 from views import home
-import sys
 
-content = html.Div(id="page-content", className="content")
+content = html.Div(id="page-content", className="Content")
 
 app.layout = html.Div(
     [dcc.Location(id="url"), home.layout, content]
@@ -20,4 +14,3 @@ if __name__ == '__main__':
         port='2021', 
         debug=True
     )
-
