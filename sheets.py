@@ -1,15 +1,22 @@
+from google.auth import credentials
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
+from pprint import pprint
+import json 
 
-scope = [
+scopes = [
     'https://spreadsheets.google.com/feeds',
     'https://www.googleapis.com/auth/spreadsheeets',
     'https://www.googleapis.com/auth/drive.file',
     'https://www.googleapis.com/auth/drive'
 ]
 
-creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
-client = gspread.authorize(creds)
+with open('credentials.json') as f:
+    credentials = json.load(f)
 
-# sheet = client.open("DataCollectorTest").sheet1
-sheet = client.open("DataCollectorTest").sheet1
+gc = gspread.service_account_from_dict(credentials)
+sh = gc.open('DataCollector')
+data = sh.sheet1.get_all_values()
+
+
+pprint(data)
