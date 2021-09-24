@@ -6,6 +6,7 @@ import dash
 from server import app, server
 from views import home
 from API.api import *
+import random
 import os
 
 app_color = {"graph_bg": "#082255", "graph_line": "#007ACE"}
@@ -17,20 +18,20 @@ layout = html.Div([ # Main div
         html.Div([ # Header div 1
             html.H4 (
                 'EMA - Estación de Monitoreo Ambiental',
-                className='appHeaderTitle'
+                className='AppHeaderTitle'
             ),
             html.P(
                 'Comunidad Nacional de Ciencia e Innovación (CON-CIENCIA)',
-                className='appHeaderTitle gray',
+                className='AppHeaderTitle gray',
             ),
-        ], className='app__header__desc'),
+        ], className='AppHeaderDesc'),
         html.Div([
             html.A(href='https://con-ciencia.cl/'),
             html.Img(
                 src=app.get_asset_url('https://con-ciencia.cl/web/image/website/4/logo/Comunidad%20CON-CIENCIA?unique=c91f8b4'),
-                className='app__menu__img',
+                className='LogoIcon',
             )
-        ], className='app__header__logo'),
+        ], className='AppHeaderLogo'),
     ], className='AppHeader'),
 
     html.Div([ # Main Section div 2
@@ -39,7 +40,7 @@ layout = html.Div([ # Main div
                 html.Div([ # Header div
                     html.H6(
                         'Material Particulado en el Aire [ppm]',
-                        className='graph__title'
+                        className='graphTitle'
                     )
                 ]),
                 dcc.Graph(
@@ -56,41 +57,46 @@ layout = html.Div([ # Main div
                     interval=int(GRAPH_INTERVAL),
                     n_intervals=0
                 ),
-            ], className='two-thirds column wind__speed__container'),
+            ], className='two-thirds column mainGraphContainer'),
         ])
     ]),
 ], className='MainContainer')
+
 
 @app.callback(
     Output('graph-live', 'figure'), [Input('graph-update', 'n_intervals')]
 )
 def updateFigure(n):
-    # total_time = get_current_time()
+    total_time = get_current_time()
     # df0 = get_hdc_te_data(total_time - 200, total_time)
     # df1 = get_hdc_hu_data(total_time - 200, total_time)
 
+    df = dataReader()
+
     PM25 = dict(
-        name='Temperatura (C°)',
+        name='PM 2.5',
         type="scatter",
-        y=df0["hdc1080_te"],
-        line={"color": "#00BB2D"},
+        y=df[2],
+        line={"color": "#FC0000"},
         mode="lines",
+        fillcolor='rgba(69, 214, 255, 0.5)',
     )
     PM10 = dict(
-        name='Humedad (%)',
+        name='PM 10',
         type="scatter",
-        y=df1["hdc1080_hu"],
-        line={"color": "#42C4F7"},
+        y=df[3],
+        line={"color": "#45D6FF"},
         mode="lines",
+        fillcolor='rgba(69, 214, 255, 0.5)',
     )
 
     layout = dict(
         plot_bgcolor=app_color["graph_bg"],
         paper_bgcolor=app_color["graph_bg"],
         font={"color": "#fff"},
-        height=250,
+        height=500,
         autosize=True,
-        showlegend=False,
+        showlegend=True,
         xaxis={
             "range": [0, 200],
             "showline": True,
@@ -98,17 +104,14 @@ def updateFigure(n):
             "fixedrange": True,
             "tickvals": [0, 50, 100, 150, 200],
             "ticktext": ["200", "150", "100", "50", "0"],
-            "title": "Tiempo transcurrido (seg)",
+            "title": "Tiempo transcurrido [s]",
         },
         yaxis={
-            "range": [
-                min(min(df0["hdc1080_te"]), min(df1['hdc1080_hu'])),
-                max(max(df0["hdc1080_te"]), max(df1['hdc1080_hu'])),
-            ],
+            "range": [0, 90],
             "showgrid": True,
             "showline": True,
             "fixedrange": True,
-            "zeroline": False,
+            "zeroline": True,
             "gridcolor": app_color["graph_line"],
         },
     )

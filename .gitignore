@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+__init__.py
 
 # C extensions
 *.so
@@ -130,3 +131,4 @@ dmypy.json
 
 # Sensitive data
 credentials.json
+*.json
